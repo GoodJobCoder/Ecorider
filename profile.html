@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRide</title>
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --secondary: #3498db;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --accent: #f39c12;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        
+        nav ul li {
+            margin: 0 1rem;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: bold;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        nav ul li a:hover, nav ul li a.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .profile-info h2 {
+            margin: 0.5rem 0;
+            color: var(--dark);
+        }
+        
+        .profile-info p {
+            color: var(--secondary);
+        }
+        
+        .about-me {
+            margin-top: 1rem;
+            text-align: left;
+        }
+        
+        .about-me textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🌿 EcoRide</h1>
+        <p>AI-Powered Carpooling & Public Transportation Platform</p>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Sign Out</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="carpool.html">Carpool</a></li>
+            <li><a href="transit.html">Public Transit</a></li>
+            <li><a href="profile.html" class="active">Profile</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Basic_human_drawing.png" alt="Profile Picture" class="profile-image">
+        <div class="profile-info">
+            <h2 id="user-name">Loading...</h2>
+            <p id="user-email">Loading...</p>
+        </div>
+        <div class="about-me">
+            <h3>About Me</h3>
+            <textarea id="aboutMe" placeholder="Tell us about yourself..."></textarea>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Eco-Commute. All rights reserved.</p>
+        <p>Powered by Gemini AI</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjmESmBna52PR2H2cbVvQ27hVcYXbMt2c",
+            authDomain: "ecoride-66758.firebaseapp.com",
+            projectId: "ecoride-66758",
+            storageBucket: "ecoride-66758.firebasestorage.app",
+            messagingSenderId: "964243157241",
+            appId: "1:964243157241:web:1026706638caff70553228",
+            measurementId: "G-D8VGC677WW"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userRef);
+                
+                if (userDoc.exists()) {
+                    document.getElementById("user-name").textContent = `${userDoc.data().firstName} ${userDoc.data().lastName}`;
+                    document.getElementById("user-email").textContent = userDoc.data().email;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

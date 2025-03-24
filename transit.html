@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script>
+    async function callGeminiAI() {
+        const apiKey = "AIzaSyCbNnhAh81pHpc96tKcHBGwJzQIimk5JMQ";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+        // Step 1: Get different bus stops
+        const stopPrompts = [
+            "Give me the name of a single bus stop that one bus stops at in the San Jose area. No additional text.",
+            "Provide the name of a bus stop in San Jose that is used by a single bus route in a day. Only the name, nothing else.",
+            "Tell me one bus stop in San Jose where a single bus stops daily. Just the name, no other text."
+        ];
+
+        let busStops = [];
+
+        for (let x = 0; x < 3; x++) {
+            let stopResponse = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: stopPrompts[x] }] }] }),
+            });
+
+            let stopData = await stopResponse.json();
+            let stopName = stopData.candidates?.[0]?.content?.parts?.[0]?.text || "Unknown Stop";
+
+            busStops.push(stopName);
+            document.getElementById(`route${x + 1}`).innerText = stopName;
+
+            // Step 2: Get stop times and average wait times for this bus stop
+            let schedulePrompt = `For the bus stop named "${stopName}" in San Jose, provide the bus stop times throughout the day and the average wait time. Format it as: Stop Times: list of times. Average Wait Time: time in minutes. Make the Stop Times and Average Wait Time on different lines. NO ADDITIONAL TEXT. I REPEAT ZERO ADDITIONAL TEXT. If you are unnable to find the timings, please ouput an estaimated time and no other text. If there are more than three times, please provie a range with an interval, ex: Throughout the Day; Thirty Minute Intervals. If this is the case, do not put Estimated Stop Times before the text. Only provide timings that align with the current time.`;
+
+            let scheduleResponse = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: schedulePrompt }] }] }),
+            });
+
+            let scheduleData = await scheduleResponse.json();
+            let scheduleText = scheduleData.candidates?.[0]?.content?.parts?.[0]?.text || "No schedule data available.";
+
+            document.getElementById(`times${x + 1}`).innerText = scheduleText;
+
+            // Small delay to avoid API rate limits
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+    }
+
+    window.onload = callGeminiAI;
+
+    async function getStop() {
+            const apiKey = "AIzaSyCbNnhAh81pHpc96tKcHBGwJzQIimk5JMQ";
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const fromLocation = document.getElementById("from").value.trim();
+            const toLocation = document.getElementById("to").value.trim();
+
+            if (!fromLocation || !toLocation) {
+                alert("Please enter both a starting point and a destination.");
+                return;
+            }
+
+            const stopPrompts = [
+                `Give me the name of a bus stop from ${fromLocation} to ${toLocation}. No additional text.`,
+                `Provide another different bus stop along the route from ${fromLocation} to ${toLocation}. No additional text.`,
+                `Tell me one more bus stop on a route between ${fromLocation} and ${toLocation}. Just the name, no other text.`
+            ];
+
+            for (let x = 0; x < 3; x++) {
+                try {
+                    let response = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: stopPrompts[x] }] }] }),
+                    });
+
+                    let data = await response.json();
+                    let stopName = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || `Unknown Stop ${x + 1}`;
+                    document.getElementById(`route${x + 1}`).innerText = stopName;
+                } catch (error) {
+                    console.error("API error:", error);
+                    document.getElementById(`route${x + 1}`).innerText = "Error retrieving stop.";
+                }
+                 let schedulePrompt = `For the bus stop named "${stopName}" in San Jose, provide the bus stop times throughout the day and the average wait time. Format it as: Stop Times: list of times. Average Wait Time: time in minutes. Make the Stop Times and Average Wait Time on different lines. NO ADDITIONAL TEXT. I REPEAT ZERO ADDITIONAL TEXT. If you are unnable to find the timings, please ouput an estaimated time and no other text. If there are more than three times, please provie a range with an interval, ex: Throughout the Day; Thirty Minute Intervals. If this is the case, do not put Estimated Stop Times before the text. Only provide timings that align with the current time.`;
+
+            let scheduleResponse = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: schedulePrompt }] }] }),
+            });
+
+            let scheduleData = await scheduleResponse.json();
+            let scheduleText = scheduleData.candidates?.[0]?.content?.parts?.[0]?.text || "No schedule data available.";
+
+            document.getElementById(`times${x + 1}`).innerText = scheduleText;
+
+            // Small delay to avoid API rate limits
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+            }
+    
+</script>
+    
+    <div id="aiResponse">Loading AI response...</div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Transit - Eco-Commute</title>
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --secondary: #3498db;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --accent: #f39c12;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        
+        nav ul li {
+            margin: 0 1rem;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: bold;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        nav ul li a:hover, nav ul li a.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .transit-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1rem;
+        }
+        
+        .search-panel {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results-panel {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .map-container {
+            height: 300px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #777;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .transit-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-chip {
+            padding: 0.5rem 1rem;
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-chip.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .route-card {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+        
+        .route-card:last-child {
+            border-bottom: none;
+        }
+        
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .route-time {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .route-price {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .route-details {
+            margin-bottom: 0.5rem;
+        }
+        
+        .route-segments {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .segment {
+            display: flex;
+            align-items: center;
+        }
+        
+        .segment-icon {
+            width: 24px;
+            height: 24px;
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        
+        .segment-arrow {
+            margin: 0 0.5rem;
+            color: #777;
+        }
+        
+        .route-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        
+        .route-actions {
+            margin-top: 0.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: var(--success);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .transit-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🌿 EcoRide</h1>
+        <p>AI-Powered Carpooling & Public Transportation Platform</p>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Sign Out</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="carpool.html">Carpool</a></li>
+            <li><a href="transit.html" class="active">Public Transit</a></li>
+            <li><a href="profile.html">Profile</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <h2 style="margin: 1rem 0;">Public Transit Routes</h2>
+        
+        <div class="transit-grid">
+            <div class="search-panel">
+                <form>
+                    <div class="form-group">
+                        <label for="from">From</label>
+                        <input type="text" id="from" placeholder="Enter starting point">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="to">To</label>
+                        <input type="text" id="to" placeholder="Enter destination">
+                    </div>
+                
+                    
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <input type="time" id="time">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block" onclick="callGeminiAI()">Find Routes</button>
+                </form>
+            </div>
+            
+            <div class="results-panel">
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d50818.761009981434!2d-121.9159242915173!3d37.243613035174704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1spublic%20transit!5e0!3m2!1sen!2sus!4v1742751443259!5m2!1sen!2sus" width="600" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+                
+                <h3>Available Routes</h3>
+                
+                <div class="route-card">
+                    <div class="route-header">
+                        <div class="route-time". id="times1">8:15 AM - 8:45 AM (30 min)</div>
+                    </div>
+                    
+                    <div class="route-details">
+                        <div class="route-segments", id="route1"> </div>
+                        <div class="route-stats">
+                            <div>1 transfer</div>
+                            <div>On time</div>
+                            <div>Moderate crowding</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="route-card">
+                    <div class="route-header">
+                        <div class="route-time", id="times2">8:20 AM - 9:00 AM (40 min)</div>
+                    </div>
+                    
+                    <div class="route-details">
+                        <div class="route-segments", id="route2"></div>
+                        
+                        <div class="route-stats">
+                            <div>No transfers</div>
+                            <div>5 min delay</div>
+                            <div>Low crowding</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="route-card">
+                    <div class="route-header">
+                        <div class="route-time", id="times3">8:05 AM - 8:50 AM (45 min)</div>
+                    </div>
+                    
+                    <div class="route-details">
+                        <div class="route-segments", id="route3"></div>
+                        </div>
+                        
+                        <div class="route-stats">
+                            <div>2 transfers</div>
+                            <div>On time</div>
+                            <div>High crowding</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Eco-Commute. All rights reserved.</p>
+        <p>Powered by Gemini AI</p>
+    </footer>
+</body>
+</html>

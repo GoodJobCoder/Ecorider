@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoRide - Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      margin: 50px auto;
+      padding: 20px;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      background: white;
+    }
+    
+    h2 { color: #2c3e50; }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 95%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .btn-primary { background-color: #27ae60; color: white; }
+    .btn-primary:hover { background-color: #219150; }
+    .btn-google { background-color: #db4437; color: white; }
+    .btn-google:hover { background-color: #c1351d; }
+    .btn-logout { background-color: #e74c3c; color: white; }
+    .btn-logout:hover { background-color: #c0392b; }
+    #errorMessage { color: red; font-size: 14px; }
+    #userStatus { margin-top: 10px; font-weight: bold; color: #2c3e50; }
+  </style>
+</head>
+<body>
+
+  <h2>🌱 EcoRide</h2>
+
+  <input type="text" id="firstName" placeholder="First Name"><br>
+  <input type="text" id="lastName" placeholder="Last Name"><br>
+  <input type="email" id="email" placeholder="Enter your email"><br>
+  <input type="password" id="password" placeholder="Enter your password"><br>
+
+  <button class="btn-primary" onclick="signUp()">Sign Up</button>
+  <button class="btn-primary" onclick="signIn()">Sign In</button>
+  <button class="btn-google" onclick="googleSignIn()">Sign In with Google</button>
+  <button class="btn-logout" onclick="logOut()">Sign Out</button>
+
+  <p id="userStatus"></p>
+  <p id="errorMessage"></p>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjmESmBna52PR2H2cbVvQ27hVcYXbMt2c",
+      authDomain: "ecoride-66758.firebaseapp.com",
+      projectId: "ecoride-66758",
+      storageBucket: "ecoride-66758.firebasestorage.app",
+      messagingSenderId: "964243157241",
+      appId: "1:964243157241:web:1026706638caff70553228",
+      measurementId: "G-D8VGC677WW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    function showError(message) {
+      document.getElementById("errorMessage").textContent = message;
+    }
+
+    function clearError() {
+      document.getElementById("errorMessage").textContent = "";
+    }
+
+    // Sign Up (Create account & store user info in Firestore)
+    window.signUp = async function () {
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!firstName || !lastName || !email || !password) {
+        showError("Please fill out all fields.");
+        return;
+      }
+
+      try {
+        clearError();
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await updateProfile(user, { displayName: `${firstName} ${lastName}` });
+
+        await setDoc(doc(db, "users", user.uid), {
+          firstName: firstName,
+          lastName: lastName,
+          email: email
+        });
+
+        console.log("User Signed Up:", user);
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        showError(error.message);
+      }
+    };
+
+    // Sign In (Check credentials & validate name from Firestore)
+    window.signIn = async function () {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const enteredFirstName = document.getElementById("firstName").value.trim();
+      const enteredLastName = document.getElementById("lastName").value.trim();
+
+      if (!email || !password || !enteredFirstName || !enteredLastName) {
+        showError("Please fill out all fields.");
+        return;
+      }
+
+      try {
+        clearError();
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Fetch user details from Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+
+        if (!userDoc.exists()) {
+          showError("User data not found.");
+          return;
+        }
+
+        const userData = userDoc.data();
+        if (userData.firstName !== enteredFirstName || userData.lastName !== enteredLastName) {
+          showError("First or last name does not match our records.");
+          return;
+        }
+
+        console.log("User Signed In:", user);
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        showError(error.message);
+      }
+    };
+
+    // Google Sign In (Stores user data if first time)
+    window.googleSignIn = async function () {
+      const provider = new GoogleAuthProvider();
+      try {
+        clearError();
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (!userDoc.exists()) {
+          await setDoc(doc(db, "users", user.uid), {
+            firstName: user.displayName?.split(" ")[0] || "Google",
+            lastName: user.displayName?.split(" ")[1] || "User",
+            email: user.email
+          });
+        }
+
+        console.log("Google Sign In:", user);
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        showError(error.message);
+      }
+    };
+
+    // Log Out
+    window.logOut = async function () {
+      try {
+        await signOut(auth);
+        console.log("User Signed Out");
+        document.getElementById("userStatus").textContent = "Not signed in";
+      } catch (error) {
+        showError(error.message);
+      }
+    };
+
+    // Track Auth State (Update UI)
+    onAuthStateChanged(auth, (user) => {
+      const status = document.getElementById("userStatus");
+      if (user) {
+        status.textContent = `Logged in as: ${user.displayName || user.email}`;
+      } else {
+        status.textContent = "Not signed in";
+      }
+    });
+
+  </script>
+</body>
+</html>

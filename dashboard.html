@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Commute - Smart Transportation Platform</title>
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --secondary: #3498db;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --accent: #f39c12;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        
+        nav ul li {
+            margin: 0 1rem;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: bold;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        nav ul li a:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .hero {
+            background: url('/placeholder.svg?height=500&width=1200') center/cover;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            padding: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: var(--success);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        
+        .testimonial {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .testimonial img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        
+        .footer-links a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🌿 EcoRide</h1>
+        <p>AI-Powered Carpooling & Public Transportation Platform</p>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Sign Out</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="carpool.html">Carpool</a></li>
+            <li><a href="transit.html">Public Transit</a></li>
+            <li><a href="profile.html">Profile</a></li>
+        </ul>
+    </nav>
+    
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Commute Smarter, Not Harder</h1>
+            <p>Join thousands of commuters who are saving time, money, and the environment with our AI-powered transportation platform.</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <section id="features">
+            <h2 style="text-align: center; margin: 2rem 0;">🚀 Key Features</h2>
+            <div class="grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚗</div>
+                    <h3>AI-Based Carpool Matching</h3>
+                    <p>Intelligent matching of riders & drivers with similar routes, schedules, and preferences.</p>
+                    <div>
+                        <span class="badge">AI-Powered</span>
+                        <span class="badge">Cost-Effective</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🚆</div>
+                    <h3>Public Transport Integration</h3>
+                    <p>Real-time bus, train, and metro data to suggest multi-modal trips.</p>
+                    <div>
+                        <span class="badge">Real-Time</span>
+                        <span class="badge">Multi-Modal</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🛣️</div>
+                    <h3>Traffic & Route Optimization</h3>
+                    <p>AI predicts congestion, roadblocks, and suggests optimal detours.</p>
+                    <div>
+                        <span class="badge">Predictive</span>
+                        <span class="badge">Time-Saving</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>Dynamic Pricing</h3>
+                    <p>Compares public transport vs. carpool costs & fairly splits fares.</p>
+                    <div>
+                        <span class="badge">Cost-Effective</span>
+                        <span class="badge">Fair-Split</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Incentives & Gamification</h3>
+                    <p>Rewards users for choosing sustainable travel options.</p>
+                    <div>
+                        <span class="badge">Rewards</span>
+                        <span class="badge">Eco-Friendly</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3>Calendar Integration</h3>
+                    <p>Sync with your work calendar to plan commutes for meetings and events.</p>
+                    <div>
+                        <span class="badge">Productivity</span>
+                        <span class="badge">Planning</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>Team Commuting</h3>
+                    <p>Special features for companies to coordinate employee transportation.</p>
+                    <div>
+                        <span class="badge">Corporate</span>
+                        <span class="badge">Teams</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Safety Features</h3>
+                    <p>Emergency contacts, ride tracking, and driver verification.</p>
+                    <div>
+                        <span class="badge">Security</span>
+                        <span class="badge">Peace of Mind</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">☁️</div>
+                    <h3>Weather Integration</h3>
+                    <p>Adjust commute plans based on weather forecasts and conditions.</p>
+                    <div>
+                        <span class="badge">Adaptive</span>
+                        <span class="badge">Prepared</span>
+                    </div>
+                </div>
+            </div>
+    </div>
+    
+    <footer>
+        <div class="footer-links">
+            <a href="#">About Us</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact</a>
+            <a href="#">Support</a>
+        </div>
+        <p>&copy; 2025 Eco-Commute. All rights reserved.</p>
+        <p>Powered by Gemini AI</p>
+    </footer>
+</body>
+</html>
