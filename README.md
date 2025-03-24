@@ -1,2 +1,0 @@
-# Ecorider
-EC
